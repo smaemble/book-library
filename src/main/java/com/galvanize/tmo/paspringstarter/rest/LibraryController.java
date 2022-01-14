@@ -3,6 +3,7 @@ package com.galvanize.tmo.paspringstarter.rest;
 import com.galvanize.tmo.paspringstarter.data.model.Book;
 import com.galvanize.tmo.paspringstarter.data.repositories.BookRepository;
 import com.galvanize.tmo.paspringstarter.model.BookRequest;
+import com.galvanize.tmo.paspringstarter.model.BookResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,11 +36,12 @@ public class LibraryController {
 
 
     @RequestMapping(value="/api/books", method = RequestMethod.GET)
-    public ResponseEntity<List<Book>> findAllBooks(){
+    public ResponseEntity<BookResponse> findAllBooks(){
         List<Book> allBooks = Optional.ofNullable(bookRepository.findAll()).map(l -> l.stream().sorted(
                         comparing(Book::getTitle)).collect(Collectors.toList()))
                 .orElse(new ArrayList<>());
-        return new ResponseEntity<>(allBooks, HttpStatus.OK);
+
+        return new ResponseEntity<>(new BookResponse(allBooks), HttpStatus.OK);
     }
 
     @RequestMapping(value="/api/books",

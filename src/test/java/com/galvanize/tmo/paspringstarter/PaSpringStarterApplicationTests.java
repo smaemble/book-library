@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.galvanize.tmo.paspringstarter.data.model.Book;
 import com.galvanize.tmo.paspringstarter.data.repositories.BookRepository;
 import com.galvanize.tmo.paspringstarter.model.BookRequest;
+import com.galvanize.tmo.paspringstarter.model.BookResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -63,9 +64,9 @@ class PaSpringStarterApplicationTests {
 				.andExpect(status().isOk())
 				.andReturn();
 		String content = mvcResult.getResponse().getContentAsString();
-		List<Book> books = objectMapper.readValue(content, new TypeReference<List<Book>>() {});
-		assertNotNull(books);
-		assertEquals(books.size(), 1);
+		BookResponse response = objectMapper.readValue(content, new TypeReference<BookResponse>() {});
+		assertNotNull(response);
+		assertEquals(response.getBooks().size(), 1);
 	}
 
 	@Test
@@ -76,7 +77,6 @@ class PaSpringStarterApplicationTests {
 						.characterEncoding("utf-8"))
 				.andExpect(status().isNoContent())
 				.andReturn();
-
 		List<Book> all = bookRepository.findAll();
 		assertTrue(all.isEmpty());
 	}
