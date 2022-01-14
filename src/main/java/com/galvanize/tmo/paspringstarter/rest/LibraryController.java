@@ -8,8 +8,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.Comparator.comparing;
 
 @RestController
 public class LibraryController {
@@ -28,22 +30,19 @@ public class LibraryController {
         entity.setYearPublished(bookRequest.getYearPublished());
 
         Book bookResponse = bookRepository.save(entity);
-        return new ResponseEntity<>(bookResponse, HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(bookResponse, HttpStatus.CREATED);
     }
 
 
-    @RequestMapping(value="/api/books",
-            produces = {"application/json"},
-            consumes = {"application/json"},
-            method = RequestMethod.GET)
-    public ResponseEntity<List<Book>> findAllBooks(@RequestBody BookRequest bookRequest){
-        List<Book> allBooks = bookRepository.findAll();
-        return new ResponseEntity<>(allBooks, HttpStatus.ACCEPTED);
+    @RequestMapping(value="/api/books", method = RequestMethod.GET)
+    public ResponseEntity<List<Book>> findAllBooks(){
+        List<Book> allBooks = Optional.ofNullable(bookRepository.findAll()).map(l -> l.stream().sorted(
+                        comparing(Book::getTitle)).collect(Collectors.toList()))
+                .orElse(new ArrayList<>());
+        return new ResponseEntity<>(allBooks, HttpStatus.OK);
     }
 
     @RequestMapping(value="/api/books",
-            produces = {"application/json"},
-            consumes = {"application/json"},
             method = RequestMethod.DELETE)
     public ResponseEntity removeAllBooks(){
         bookRepository.deleteAll();
